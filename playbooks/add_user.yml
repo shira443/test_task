@@ -1,0 +1,37 @@
+---
+- name: Configure host
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Create new user cloudru
+      user:
+        name: cloudru
+        password: "{{ 'cloudpass' | password_hash('sha512', 'mysecretsalt') }}"
+        createhome: yes
+        shell: /bin/bash
+
+    - name: Allow ssh access via key for user cloudru
+      authorized_key:
+        user: cloudru
+        key: "{{ lookup('file', '/etc/ansible/common/files/id_rsa.pub') }}"
+        state: present
+
+    - name: Disable ssh root login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        backup: yes
+
+    - name: Copy public key for user cloudru
+      authorized_key:
+        user: cloudru
+        key: "{{ lookup('file', '/etc/ansible/common/files/id_rsa.pub') }}"
+        state: present
+        exclusive: yes
+        
+    - name: Restart ssh service
+      service:
+        name: sshd
+        state: restarted

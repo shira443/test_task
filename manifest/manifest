@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  namespace: ns1
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app-container
+          image: shira443/app.py:v1
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 7080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 7080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          env:
+            - name: UUID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+  namespace: ns1
+spec:
+  selector:
+    app: my-app
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 7080
+      targetPort: 8080

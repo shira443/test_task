@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "my-chart-test" . }}
+  labels:
+    app: {{ template "my-chart" . }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ template "my-chart" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "my-chart" . }}
+    spec:
+      containers:
+        - name: {{ template "my-chart" . }}
+          image: {{ .Values.image.name }}
+          env:
+            - name: AUTHOR
+              value: {{ .Values.author }}

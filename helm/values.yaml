@@ -1,0 +1,4 @@
+image:
+  name: shira443/app.py:v1
+replicas: 3
+author: "shira443"

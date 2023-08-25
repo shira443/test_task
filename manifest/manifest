@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: my-app-container
-          image: shira443/app.py:v1
+          image: shira443/app.py
           ports:
             - containerPort: 80
           readinessProbe:
